@@ -165,18 +165,15 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    if not isinstance(current_user, Admin):
-        return redirect(url_for('employee_dashboard'))
-
     employees = Employee.query.order_by(Employee.id.desc()).all()
     payrolls = Payroll.query.order_by(Payroll.id.desc()).limit(50).all()
-    leaves = LeaveRequest.query.order_by(LeaveRequest.id.desc()).all()
+    leave_requests = LeaveRequest.query.order_by(LeaveRequest.id.desc()).all()
 
     return render_template(
         'index.html',
         employees=employees,
         payrolls=payrolls,
-        leaves=leaves,
+        leave_requests=leave_requests,
         departments=Department.query.all(),
         roles=Role.query.all()
     )
