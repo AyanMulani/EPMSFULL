@@ -173,9 +173,9 @@ def index():
         'index.html',
         employees=employees,
         payrolls=payrolls,
-        leave_requests=leave_requests,
         departments=Department.query.all(),
-        roles=Role.query.all()
+        roles=Role.query.all(),
+        leave_requests=leave_requests
     )
 
 # Employee CRUD + photo upload
