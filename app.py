@@ -42,7 +42,7 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
 
-class Employee(db.Model):
+class Employee(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     emp_code = db.Column(db.String(64), unique=True, nullable=False)
     first_name = db.Column(db.String(200))
@@ -54,6 +54,7 @@ class Employee(db.Model):
     email = db.Column(db.String(120))
     address = db.Column(db.Text)
     photo = db.Column(db.String(300))
+
     password_hash = db.Column(db.String(200))
 
     department = db.relationship('Department', backref=db.backref('employees', lazy=True))
@@ -155,9 +156,12 @@ def login():
 @app.route('/logout')
 def logout():
     if current_user.is_authenticated:
-        log_action(current_user.username, 'logout')
-    logout_user(); return redirect(url_for('login'))
-
+        if isinstance(current_user, Admin):
+            log_action(current_user.username, 'logout')
+        else:
+            log_action(current_user.emp_code, 'logout')
+    logout_user()
+    return redirect(url_for('login'))
 @app.route('/')
 @login_required
 def index():
