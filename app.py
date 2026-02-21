@@ -165,9 +165,21 @@ def logout():
 @app.route('/')
 @login_required
 def index():
+    if not isinstance(current_user, Admin):
+        return redirect(url_for('employee_dashboard'))
+
     employees = Employee.query.order_by(Employee.id.desc()).all()
     payrolls = Payroll.query.order_by(Payroll.id.desc()).limit(50).all()
-    return render_template('index.html', employees=employees, payrolls=payrolls, departments=Department.query.all(), roles=Role.query.all())
+    leaves = LeaveRequest.query.order_by(LeaveRequest.id.desc()).all()
+
+    return render_template(
+        'index.html',
+        employees=employees,
+        payrolls=payrolls,
+        leaves=leaves,
+        departments=Department.query.all(),
+        roles=Role.query.all()
+    )
 
 # Employee CRUD + photo upload
 @app.route('/employee/add', methods=['POST'])
