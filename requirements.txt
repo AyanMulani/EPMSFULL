@@ -1,8 +1,8 @@
 Flask
 Flask-SQLAlchemy
 Flask-Login
+gunicorn
 Werkzeug
 reportlab
 pandas
-gunicorn
 psycopg2-binary
