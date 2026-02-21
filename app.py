@@ -261,19 +261,24 @@ def attendance_checkout():
     return jsonify({'ok':True,'msg':'checked out','date':d.isoformat()})
 
 # Leave requests
-@app.route('/leave/request', methods=['POST'])
+@app.route('/leave/<int:lid>/decide', methods=['POST'])
 @login_required
-def leave_request():
-    f = request.form
-    emp = Employee.query.filter_by(emp_code=f.get('emp_code','').strip()).first()
-    if not emp: return jsonify({'ok':False,'error':'employee not found'}),404
-    try:
-        s = datetime.date.fromisoformat(f.get('start_date')); e = datetime.date.fromisoformat(f.get('end_date'))
-    except Exception as exc:
-        return jsonify({'ok':False,'error':'invalid dates'}),400
-    lr = LeaveRequest(employee_id=emp.id, start_date=s, end_date=e, reason=f.get('reason'))
-    db.session.add(lr); db.session.commit(); log_action(current_user.username, f'leave request {emp.emp_code}')
-    return jsonify({'ok':True,'id':lr.id})
+def leave_decide(lid):
+
+    lr = LeaveRequest.query.get_or_404(lid)
+
+    action = request.form.get('action')
+
+    if action not in ('approved', 'rejected'):
+        flash("Invalid action", "danger")
+        return redirect(url_for("index"))
+
+    lr.status = action
+    db.session.commit()
+
+    log_action(current_user.username, f'leave {action} {lr.id}')
+
+    return redirect(url_for("index"))   # 🔥 IMPORTANT FIX
 
 @app.route('/leave/<int:lid>/decide', methods=['POST'])
 @login_required
