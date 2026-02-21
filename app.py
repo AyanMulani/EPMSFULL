@@ -280,14 +280,7 @@ def leave_decide(lid):
 
     return redirect(url_for("index"))   # 🔥 IMPORTANT FIX
 
-@app.route('/leave/<int:lid>/decide', methods=['POST'])
-@login_required
-def leave_decide(lid):
-    lr = LeaveRequest.query.get_or_404(lid)
-    action = request.form.get('action')
-    if action not in ('approved','rejected'): return jsonify({'ok':False,'error':'invalid action'}),400
-    lr.status = action; db.session.commit(); log_action(current_user.username, f'leave {action} {lr.id}')
-    return jsonify({'ok':True})
+
 
 # Payroll create (simple)
 @app.route('/payroll/create', methods=['POST'])
